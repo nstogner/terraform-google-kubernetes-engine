@@ -19,7 +19,7 @@
  *****************************************/
 resource "google_container_cluster" "primary" {
   provider    = "google-beta"
-  count       = "${var.regional ? 1 : 0}"
+  count       = "${(local.cluster_deployment_type == "regional") ? 1 : 0}"
   name        = "${var.name}"
   description = "${var.description}"
   project     = "${var.project_id}"
@@ -34,7 +34,7 @@ resource "google_container_cluster" "primary" {
   logging_service    = "${var.logging_service}"
   monitoring_service = "${var.monitoring_service}"
 
-  master_authorized_networks_config = "${var.master_authorized_networks_config}"
+  master_authorized_networks_config = ["${var.master_authorized_networks_config}"]
 
   addons_config {
     http_load_balancing {
@@ -91,7 +91,7 @@ resource "google_container_cluster" "primary" {
  *****************************************/
 resource "google_container_node_pool" "pools" {
   provider           = "google-beta"
-  count              = "${var.regional ? length(var.node_pools) : 0}"
+  count              = "${(local.cluster_deployment_type == "regional") ? length(var.node_pools) : 0}"
   name               = "${lookup(var.node_pools[count.index], "name")}"
   project            = "${var.project_id}"
   region             = "${var.region}"
@@ -140,7 +140,7 @@ resource "google_container_node_pool" "pools" {
 }
 
 resource "null_resource" "wait_for_regional_cluster" {
-  count = "${var.regional ? 1 : 0}"
+  count = "${(local.cluster_deployment_type == "regional") ? 1 : 0}"
 
   provisioner "local-exec" {
     command = "${path.module}/scripts/wait-for-cluster.sh ${var.project_id} ${var.name}"
