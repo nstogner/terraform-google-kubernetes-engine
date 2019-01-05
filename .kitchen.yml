@@ -79,6 +79,7 @@ suites:
       root_module_directory: test/fixtures/simple_regional_private
     verifier:
       name: terraform
+      color: false
       systems:
         - name: simple_regional_private
           backend: local
@@ -103,6 +104,7 @@ suites:
       root_module_directory: test/fixtures/simple_zonal_private
     verifier:
       name: terraform
+      color: false
       systems:
         - name: simple_zonal_private
           backend: local
